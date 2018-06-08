@@ -167,6 +167,7 @@ class ImageWithThumbsFieldFile(ImageFieldFile):
         size = thumb_options['size']
         upscale = thumb_options.get('upscale', True)
         crop = thumb_options.get('crop')
+        quality = thumb_options.get('quality')
         if crop is True:
             # We'll just make an assumption here. Center cropping is the
             # typical default.
@@ -188,7 +189,7 @@ class ImageWithThumbsFieldFile(ImageFieldFile):
         # RAM then hit swap.
         img_fobj = cStringIO.StringIO()
         # This writes the thumbnailed PIL.Image to the file-like object.
-        THUMBNAIL_ENGINE.write(thumbed_image, img_fobj, format=file_extension)
+        THUMBNAIL_ENGINE.write(thumbed_image, img_fobj, quality=quality, format=file_extension, )
         # Save the result to the storage backend.
         thumb_content = ContentFile(img_fobj.getvalue())
         self.storage.save(thumb_filename, thumb_content)

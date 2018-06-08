@@ -18,9 +18,9 @@ from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured
 
 try:
-    from boto3.s3.connection import S3Connection
-    from boto3.exception import S3ResponseError
-    from boto3.s3.key import Key
+    from boto.s3.connection import S3Connection
+    from boto.exception import S3ResponseError
+    from boto.s3.key import Key
 except ImportError:
     raise ImproperlyConfigured(
         "Could not load boto's S3 bindings. Please install boto."
