@@ -167,7 +167,7 @@ class ImageWithThumbsFieldFile(ImageFieldFile):
         size = thumb_options['size']
         upscale = thumb_options.get('upscale', True)
         crop = thumb_options.get('crop')
-        quality = thumb_options.get('quality')
+        quality = thumb_options.get('quality', 80)
         if crop is True:
             # We'll just make an assumption here. Center cropping is the
             # typical default.
@@ -206,6 +206,7 @@ class ImageWithThumbsFieldFile(ImageFieldFile):
             self.storage.delete(thumb_filename)
 
         super(ImageWithThumbsFieldFile, self).delete(save)
+
 
 class ImageWithThumbsField(ImageField):
     """
