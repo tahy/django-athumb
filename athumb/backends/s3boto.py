@@ -237,7 +237,10 @@ class S3BotoStorage(Storage):
         return name
 
 
-class S3BotoStorage_AllPublic(S3BotoStorage):
+from storages.backends.s3boto3 import S3Boto3Storage as S3BotoStorage_origin
+from storages.backends.s3boto3 import S3Boto3StorageFile as S3BotoStorageFile
+
+class S3BotoStorage_AllPublic(S3BotoStorage_origin):
     """
     Same as S3BotoStorage, but defaults to uploading everything with a
     public acl. This has two primary beenfits:
@@ -272,38 +275,38 @@ class S3BotoStorage_AllPublic(S3BotoStorage):
         return "http://s3.amazonaws.com/%s/%s" % (self.bucket_name, name)
 
 
-class S3BotoStorageFile(File):
-    def __init__(self, name, mode, storage):
-        self._storage = storage
-        self.name = name
-        self._mode = mode
-        self.key = storage.bucket.get_key(name)
-        self._is_dirty = False
-        self.file = StringIO()
-
-    @property
-    def size(self):
-        if not self.key:
-            raise IOError('No such S3 key: %s' % self.name)
-        return self.key.size
-
-    def read(self, *args, **kwargs):
-        self.file = StringIO()
-        self._is_dirty = False
-        if not self.key:
-            raise IOError('No such S3 key: %s' % self.name)
-        self.key.get_contents_to_file(self.file)
-        return self.file.getvalue()
-
-    def write(self, content):
-        if 'w' not in self._mode:
-            raise AttributeError("File was opened for read-only access.")
-        self.file = StringIO(content)
-        self._is_dirty = True
-
-    def close(self):
-        if self._is_dirty:
-            if not self.key:
-                self.key = self._storage.bucket.new_key(key_name=self.name)
-            self.key.set_contents_from_string(self.file.getvalue(), headers=self._storage.headers, policy=self.storage.acl)
-        self.key.close()
+# class S3BotoStorageFile(File):
+#     def __init__(self, name, mode, storage):
+#         self._storage = storage
+#         self.name = name
+#         self._mode = mode
+#         self.key = storage.bucket.get_key(name)
+#         self._is_dirty = False
+#         self.file = StringIO()
+#
+#     @property
+#     def size(self):
+#         if not self.key:
+#             raise IOError('No such S3 key: %s' % self.name)
+#         return self.key.size
+#
+#     def read(self, *args, **kwargs):
+#         self.file = StringIO()
+#         self._is_dirty = False
+#         if not self.key:
+#             raise IOError('No such S3 key: %s' % self.name)
+#         self.key.get_contents_to_file(self.file)
+#         return self.file.getvalue()
+#
+#     def write(self, content):
+#         if 'w' not in self._mode:
+#             raise AttributeError("File was opened for read-only access.")
+#         self.file = StringIO(content)
+#         self._is_dirty = True
+#
+#     def close(self):
+#         if self._is_dirty:
+#             if not self.key:
+#                 self.key = self._storage.bucket.new_key(key_name=self.name)
+#             self.key.set_contents_from_string(self.file.getvalue(), headers=self._storage.headers, policy=self.storage.acl)
+#         self.key.close()
