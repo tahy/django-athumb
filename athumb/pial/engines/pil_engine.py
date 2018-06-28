@@ -127,6 +127,8 @@ class PILEngine(EngineBase):
             image.save(buf, format=format, quality=quality, optimize=1)
         except IOError:
             # optimize is a no-go, omit it this attempt.
+            if format == 'JPEG':
+                image = image.convert("RGB")
             image.save(buf, format=format, quality=quality)
 
         raw_data = buf.getvalue()
